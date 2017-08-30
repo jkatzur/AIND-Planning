@@ -76,6 +76,7 @@ class AirCargoProblem(Problem):
             """Create all concrete Fly actions and return a list
 
             :return: list of Action objects
+            USE THIS TO FUNCTION TO HELP ME BUILD LOAD_ACTIONS AND UNLOAD_ACTIONS
             """
             flys = []
             for fr in self.airports:
@@ -96,13 +97,13 @@ class AirCargoProblem(Problem):
         return load_actions() + unload_actions() + fly_actions()
 
     def actions(self, state: str) -> list:
-        """ Return the actions that can be executed in the given state.
-
-        :param state: str
-            state represented as T/F string of mapped fluents (state variables)
-            e.g. 'FTTTFF'
-        :return: list of Action objects
-        """
+        #  Return the actions that can be executed in the given state.
+        #
+        # :param state: str
+        #     state represented as T/F string of mapped fluents (state variables)
+        #     e.g. 'FTTTFF'
+        # :return: list of Action objects
+        # THIS MEANS WHICH ACTIONS ARE POSSIBLE - this is just the combine of Load, Unload, and Fly
         # TODO implement
         possible_actions = []
         return possible_actions
@@ -121,11 +122,11 @@ class AirCargoProblem(Problem):
         return encode_state(new_state, self.state_map)
 
     def goal_test(self, state: str) -> bool:
-        """ Test the state to see if goal is reached
-
-        :param state: str representing state
-        :return: bool
-        """
+        # """ Test the state to see if goal is reached
+        #
+        # :param state: str representing state
+        # :return: bool
+        # """
         kb = PropKB()
         kb.tell(decode_state(state, self.state_map).pos_sentence())
         for clause in self.goal:

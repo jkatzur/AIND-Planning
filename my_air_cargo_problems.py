@@ -88,7 +88,7 @@ class AirCargoProblem(Problem):
                         precond_neg = []
                         effect_add = [expr("At({}, {})".format(c, a))]
                         effect_rem = [expr("In({}, {})".format(c, p))]
-                        unload = Action(expr("UnLoad({}, {}, {})".format(c, p, a)),
+                        unload = Action(expr("Unload({}, {}, {})".format(c, p, a)),
                                      [precond_pos, precond_neg],
                                      [effect_add, effect_rem])
                         unloads.append(unload)
@@ -221,7 +221,7 @@ def air_cargo_p1() -> AirCargoProblem:
     pos = [expr('At(C1, SFO)'),
            expr('At(C2, JFK)'),
            expr('At(P1, SFO)'),
-           expr('At(P2, JFK)')
+           expr('At(P2, JFK)'),
            ]
     neg = [expr('At(C2, SFO)'),
            expr('In(C2, P1)'),
@@ -230,11 +230,11 @@ def air_cargo_p1() -> AirCargoProblem:
            expr('In(C1, P1)'),
            expr('In(C1, P2)'),
            expr('At(P1, JFK)'),
-           expr('At(P2, SFO)')
+           expr('At(P2, SFO)'),
            ]
     init = FluentState(pos, neg)
     goal = [expr('At(C1, JFK)'),
-            expr('At(C2, SFO)')
+            expr('At(C2, SFO)'),
             ]
     return AirCargoProblem(cargos, planes, airports, init, goal)
 
@@ -248,7 +248,7 @@ def air_cargo_p2() -> AirCargoProblem:
            expr('At(C3, ATL)'),
            expr('At(P1, SFO)'),
            expr('At(P2, JFK)'),
-           expr('At(P3, ATL)')
+           expr('At(P3, ATL)'),
            ]
     neg = []
     for c in cargos:
@@ -263,7 +263,7 @@ def air_cargo_p2() -> AirCargoProblem:
     init = FluentState(pos, neg)
     goal = [expr('At(C1, JFK)'),
             expr('At(C2, SFO)'),
-            expr('At(C3, SFO)')
+            expr('At(C3, SFO)'),
             ]
     return AirCargoProblem(cargos, planes, airports, init, goal)
 
@@ -295,6 +295,6 @@ def air_cargo_p3() -> AirCargoProblem:
     goal = [expr('At(C1, JFK)'),
             expr('At(C2, SFO)'),
             expr('At(C3, JFK)'),
-            expr('At(C4, SFO)')
+            expr('At(C4, SFO)'),
             ]
     return AirCargoProblem(cargos, planes, airports, init, goal)

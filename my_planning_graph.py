@@ -514,12 +514,23 @@ class PlanningGraph():
                     return False
         return is_mutex
 
+    def goal_level(self, goal:expr) -> int:
+        # This returns the level a goal is found in the graph
+        counter = 0
+        for s in self.s_levels:
+            for n in s:
+                if (goal == n.symbol) & (n.is_pos):
+                    return counter
+            counter += 1
+
+
     def h_levelsum(self) -> int:
         """The sum of the level costs of the individual goals (admissible if goals independent)
 
         :return: int
         """
         level_sum = 0
-        # TODO implement
+        for g in self.problem.goal:
+            level_sum += self.goal_level(g)
         # for each goal in the problem, determine the level cost, then add them together
         return level_sum

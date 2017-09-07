@@ -253,13 +253,13 @@ def air_cargo_p2() -> AirCargoProblem:
     neg = []
     for c in cargos:
         for p in planes:
-            neg.append([expr("In({}, {})".format(c, p))])
+            neg.append([expr('In({}, {})'.format(c, p))])
 
     for i in range(0,3):
         for j in range(0,3):
             if i != j:
-                neg.append([expr("At({}, {})".format(cargos[i], airports[j]))])
-                neg.append([expr("At({}, {})".format(planes[i], airports[j]))])
+                neg.append([expr('At({}, {})'.format(cargos[i], airports[j]))])
+                neg.append([expr('At({}, {})'.format(planes[i], airports[j]))])
     init = FluentState(pos, neg)
     goal = [expr('At(C1, JFK)'),
             expr('At(C2, SFO)'),
@@ -282,14 +282,14 @@ def air_cargo_p3() -> AirCargoProblem:
     neg = []
     for c in cargos:
         for p in planes:
-            neg.append([expr("In({}, {})".format(c, p))])
+            neg.append([expr('In({}, {})'.format(c, p))])
 
     for i in range(0,4):
         for j in range(0,4):
             if i != j:
-                neg.append([expr("At({}, {})".format(cargos[i], airports[j]))])
+                neg.append([expr('At({}, {})'.format(cargos[i], airports[j]))])
                 if i < 2:
-                    neg.append([expr("At({}, {})".format(planes[i], airports[j]))])
+                    neg.append([expr('At({}, {})'.format(planes[i], airports[j]))])
 
     init = FluentState(pos, neg)
     goal = [expr('At(C1, JFK)'),

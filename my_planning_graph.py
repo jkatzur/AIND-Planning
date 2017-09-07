@@ -401,8 +401,14 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+
         for e in node_a1.action.effect_add:
             for f in node_a2.action.effect_rem:
+                if e == f: return True
+
+        #Need to check positive actions of either action against negative
+        for e in node_a2.action.effect_add:
+            for f in node_a1.action.effect_rem:
                 if e == f: return True
 
         return False
@@ -421,7 +427,14 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        # TODO test for Interference between nodes
+        for e in node_a1.action.effect_add:
+            for f in node_a2.action.precond_pos:
+                if e == f: return True
+
+        for e in node_a2.action.effect_add:
+            for f in node_a1.action.precond_pos:
+                if e == f: return True
+
         return False
 
     def competing_needs_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:

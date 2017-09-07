@@ -56,6 +56,7 @@ class AirCargoProblem(Problem):
 
         def load_actions():
             """Create all concrete Load actions and return a list
+            I followed the format found in the example_have_cake functions to complete
 
             :return: list of Action objects
             """
@@ -128,14 +129,18 @@ class AirCargoProblem(Problem):
         possible_actions = []
         kb = PropKB()
         kb.tell(decode_state(state, self.state_map).pos_sentence())
+        # Across all potential actions
         for action in self.get_actions():
             is_possible = True
+            # These for loops confirm that this action is possible - if not we won't add it
             for clause in action.precond_pos:
                 if clause not in kb.clauses:
                     is_possible = False
+            # Any preconditions that it requires to be false must be false
             for clause in action.precond_neg:
                 if clause in kb.clauses:
                     is_possible = False
+            # Only adds actions whose preconditions are met
             if is_possible:
                 possible_actions.append(action)
         return possible_actions
@@ -203,12 +208,18 @@ class AirCargoProblem(Problem):
         conditions by ignoring the preconditions required for an action to be
         executed.
         """
-        # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        # Must implement method to determine minimum number of actions
+        # Used the text to understand what this really means. Essentially - this
+        # function says "how many aspects of the goal have to change for us to be at the goal"
+        # it pays no attention to how hard it is / how many steps to get to the goal - just counts
+        # how many goals we have not hit yet and returns that number
         count = 0
+        # Create a Propositional-logic KB that will be used to map the existing paths
         kb = PropKB()
+        # This structures the path data in a way where we can determine if a goal clause is true
         kb.tell(decode_state(node.path(), self.state_map).pos_sentence())
+        # For each part of the goal...
         for clause in self.goal:
+            # If that part is not answered in the existing path - add 1 (e.g count this as a "miss")
             if clause not in kb.clauses:
                 count += 1
         return count
@@ -251,10 +262,15 @@ def air_cargo_p2() -> AirCargoProblem:
            expr('At(P3, ATL)'),
            ]
     neg = []
+    # For all cargos, it is not in a plane. This adds all those negations together
     for c in cargos:
         for p in planes:
             neg.append([expr('In({}, {})'.format(c, p))])
 
+    # This is a bit trickier - it is saying that we know that the cargo and planes
+    # Are only aligned in order (e.g C1 and P1 at JFK and not the others)
+    # This nested for let's us easily add the negative for all other combinations
+    # Of cargos / planes and airports
     for i in range(0,3):
         for j in range(0,3):
             if i != j:
@@ -280,10 +296,16 @@ def air_cargo_p3() -> AirCargoProblem:
            expr('At(P2, JFK)'),
            ]
     neg = []
+    # For all cargos, it is not in a plane. This adds all those negations together
+
     for c in cargos:
         for p in planes:
             neg.append([expr('In({}, {})'.format(c, p))])
-
+    
+    # This is a bit trickier - it is saying that we know that the cargo and planes
+    # Are only aligned in order (e.g C1 and P1 at JFK and not the others)
+    # This nested for let's us easily add the negative for all other combinations
+    # Of cargos / planes and airports
     for i in range(0,4):
         for j in range(0,4):
             if i != j:

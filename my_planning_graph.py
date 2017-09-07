@@ -310,11 +310,18 @@ class PlanningGraph():
         #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
         #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
         #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
+        # First I need to add a set in the a_levels for me to add additional actions to
         self.a_levels.append(set())
+        # Loop through all possible actions to determine which I can actually add
         for a in self.all_actions:
             add_node = PgNode_a(a)
+            # This tests if all of the preconditions for the potential action I want to add are
+            # present in the prior state
             if add_node.prenodes.issubset(self.s_levels[level]):
                 for s in self.s_levels[level]:
+                    # If all preconditions were present this statement connects the action to the relevant prior states by
+                    # 1) Making the action a child of the preceeding states, and
+                    # 2) Making the preceeding states a parent of the action
                     if s in add_node.prenodes:
                         add_node.parents.add(s)
                         s.children.add(add_node)
@@ -338,8 +345,13 @@ class PlanningGraph():
         #   may be "added" to the set without fear of duplication.  However, it is important to then correctly create and connect
         #   all of the new S nodes as children of all the A nodes that could produce them, and likewise add the A nodes to the
         #   parent sets of the S nodes
+
+        # Loop through all possible actions to determine which I can actually add
         self.s_levels.append(set())
         for a in self.a_levels[level-1]:
+            # If the effect of an action is a state, then connect the state with the action that caused it by...
+            # 1) Making the state a child of the preceeding action, and
+            # 2) Making the action a parent to the effect state
             for s in a.effnodes:
                 self.s_levels[level].add(s)
                 s.parents.add(a)
@@ -402,11 +414,12 @@ class PlanningGraph():
         :return: bool
         """
 
+        # Check to see if the effect of one node is negating the effect of another
         for e in node_a1.action.effect_add:
             for f in node_a2.action.effect_rem:
                 if e == f: return True
 
-        #Need to check positive actions of either action against negative
+        #Same check, reverse nodes
         for e in node_a2.action.effect_add:
             for f in node_a1.action.effect_rem:
                 if e == f: return True
@@ -427,10 +440,12 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        # Check to see if the effect of one node negates a precondition for another
         for e in node_a1.action.effect_add:
             for f in node_a2.action.precond_pos:
                 if e == f: return True
 
+        #Same check, reverse nodes
         for e in node_a2.action.effect_add:
             for f in node_a1.action.precond_pos:
                 if e == f: return True
@@ -447,10 +462,11 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        # This looks at all parents of these nodes to see if they are mutex with
+        # each other. If parents are mutexes these actions are also mutexes
         for p1 in node_a1.parents:
             for p2 in node_a2.parents:
-                #Not sure if mutex is always reflexive - I think so
-                if p1.is_mutex(p2) or p2.is_mutex(p1): return True
+                if p1.is_mutex(p2): return True
         return False
 
     def update_s_mutex(self, nodeset: set):
@@ -485,6 +501,8 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
+        # Negation mutex just makes sure that these nodes aren't directly negating each other
+        # This test sees if they are the same symbol part of expression but opposite value
         if (node_s1.symbol == node_s2.symbol) & (node_s1.is_pos != node_s2.is_pos): return True
         return False
 
@@ -504,17 +522,30 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
+        # This structure is testing to see if ALL of the parents for a pair of
+        # nodes are mutex each other.
+
+        # I start with False - because nodes with no parents, for example, are not mutex each other.
         is_mutex = False
         for p1 in node_s1.parents:
             for p2 in node_s2.parents:
-                #Not sure if mutex is always reflexive - I think so
+                # If there is at least one mutex present, I flip to True
                 if p1.is_mutex(p2):
                     is_mutex = True
                 else:
+                    # But if we find any future False mutexes in the parent I immediately return False to save time
                     return False
         return is_mutex
 
     def goal_level(self, goal:expr) -> int:
+        """
+        Helper function designed to return the level of the graph a particular goal expr will be achieved
+        This function is called within a PlanningGraph, takes in the target goal expression
+        and returns an int for the number of steps to hit that goal
+
+        :param goal: expr
+        :return: int
+        """
         # This returns the level a goal is found in the graph
         counter = 0
         for s in self.s_levels:
@@ -530,7 +561,7 @@ class PlanningGraph():
         :return: int
         """
         level_sum = 0
+        # for each goal in the problem, determine the level cost, then add them together
         for g in self.problem.goal:
             level_sum += self.goal_level(g)
-        # for each goal in the problem, determine the level cost, then add them together
         return level_sum

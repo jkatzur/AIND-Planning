@@ -8,7 +8,8 @@ from lp_utils import (
     FluentState, encode_state, decode_state,
 )
 from my_planning_graph import PlanningGraph
-import ipdb
+# Used for debugging - apparently gives error on submission
+# import ipdb
 from functools import lru_cache
 
 
@@ -218,7 +219,8 @@ class AirCargoProblem(Problem):
         # This structures the path data in a way where we can determine if a goal clause is true
         # I need to switch this over
         kb.tell(decode_state(node.state, self.state_map).pos_sentence())
-        #ipdb.set_trace()
+        # I used this for debugging
+        # ipdb.set_trace()
         # For each part of the goal...
         for clause in self.goal:
             # If that part is not answered in the existing path - add 1 (e.g count this as a "miss")
